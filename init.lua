@@ -84,9 +84,6 @@ require('vscode').setup({
     -- Enable transparent background
     transparent = true,
 
-    -- Enable italic comment
-    italic_comments = true,
-
     -- Disable nvim-tree background color
     disable_nvimtree_bg = true,
 
@@ -106,7 +103,7 @@ require('vscode').load()
 
 -- autoformat cpp + python
 vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = {"*.cpp", "*.py"},
+  pattern = {"*.cpp","*.hpp","*.py"},
   callback = function()
     vim.lsp.buf.formatting_sync(nil, 1000)
   end,

@@ -39,11 +39,11 @@ if not vim.loop.fs_stat(lazypath) then
     "git",
     "clone",
     "--filter=blob:none",
-    "https://github.com/LazyVim/LazyVim.git",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
     lazypath,
   })
 end
-
 vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   { "Mofiqul/vscode.nvim" },
@@ -101,10 +101,26 @@ require('vscode').setup({
 })
 require('vscode').load()
 
--- autoformat cpp + python
+-- autoformat cpp
 vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = {"*.cpp","*.hpp","*.py"},
+  pattern = {"*.c", "*.cpp", "*.h"},
   callback = function()
-    vim.lsp.buf.formatting_sync(nil, 1000)
+    -- Save current cursor position
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+    -- Save current view state
+    local view = vim.fn.winsaveview()
+
+    -- Execute clang-format
+    vim.cmd("%!clang-format")
+
+    -- Restore the view state
+    vim.fn.winrestview(view)
+
+    -- Restore the cursor position
+    -- Adjusting for potential changes in line numbers
+    local last_line = vim.api.nvim_buf_line_count(0)
+    cursor_pos[1] = math.min(cursor_pos[1], last_line)
+    vim.api.nvim_win_set_cursor(0, cursor_pos)
   end,
 })
